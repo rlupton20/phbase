@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <title>phbase documentation</title>
+
+  <head>
+    <style>
+      :root {
+	--background-color: #fdf6e3;
+	--link-inactive-color: #57697b;
+	--link-active-color: #2FACAD;
+	--code-color: #181818;
+        --block-clickable-color: #defafa;
+      }
+
+      html {
+        background-color: var(--background-color);
+      }
+
+      section, section:target ~ section:last-of-type {
+        display: none;
+      }
+
+      section:target, section:last-of-type {
+        display: inherit;
+      }
+
+      div.navigation {
+        font-family: monospace;
+        letter-spacing: 5px;
+        font-weight: bold;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 10px;
+        text-decoration: none;
+      }
+
+      div.text {
+        padding: 20px 0;
+      }
+
+      a:link, a:visited {
+        text-decoration: none;
+        color: var(--link-inactive-color);
+      }
+
+      a:hover {
+        color: var(--link-active-color);
+      }
+
+      code {
+        color: var(--code-color);
+      }
+
+      #content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 10px;
+        font-size: 18px;
+
+        line-height: 1.5;
+        text-align: justify;
+      }
+
+      #header-title {
+        font-family: monospace;
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 80px;
+        margin-bottom: 100px;
+        letter-spacing: 20px;
+      }
+
+      #footer {
+        font-size: 12px;
+        text-align: center;
+        margin-top: 80px;
+      }
+
+      h3.libentity {
+        font-family: monospace;
+	white-space: pre;
+      }
+
+      table.links {
+        padding-top: 20px;
+	width: 100%
+      }
+
+      .links tr:hover {
+        background-color: var(--block-clickable-color);
+      }
+
+      table.params {
+        max-width: 600px;
+        font-size: 0.9em;
+      }
+
+      .params td {
+        padding: 6px 7px;
+      }
+
+      .code {
+        font-family: monospace;
+	white-space: pre;
+        color: var(--code-color);
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div id="header-title">
+        <a class="site-title" href="#">phbase</a>
+      </div>
+
+      <div class="navigation">
+        <a href="#about">about</a>
+        <a href="#reference">reference</a>
+      </div>
+    </header>
+
+    <div id="content">
+
+      <section id="reference">
+	<div class="links">
+	  <table class="links">
+	    <tr onclick="window.location='#core';">
+              <td><a class="navigation" href="#core">core</a></td>
+	      <td>core utilities</td>
+	    </tr>
+
+	    <tr onclick="window.location='#utf8';">
+              <td><a class="navigation" href="#utf8">utf8</a></td>
+	      <td>utf-8 decoding function</td>
+	    </tr>
+
+	    <tr onclick="window.location='#arena';">
+              <td><a class="navigation" href="#arena">arena</a></td>
+	      <td>lightweight arena allocator</td>
+	    </tr>
+
+	  </table>
+	</div>
+      </section>
+
+      <section id="core">
+	<h2>core</h2>
+        <p><code>phbase/core.h</code> provides small tools which are generally useful.</p>
+
+	<div class="reference">
+	  <h3 class="libentity">PHBASE_STATIC_ARRAY_LENGTH(a)</h3>
+	  <p>For statically defined arrays, determine the array length at compile time.</p>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">PHBASE_STATIC_STRLEN(s)</h3>
+	  <p>For statically defined strings, determine the string length at compile time. Doesn't count the null terminating byte.</p>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">PHBASE_UNUSED_PARAMETER(p)</h3>
+	  <p>Used inside procedure bodies to declare a paramter unused.</p>
+	</div>
+
+      </section>
+
+      <section id="utf8">
+	<h2>utf8</h2>
+        <p><code>phbase/utf8.h</code> provides simple facilities for decoding utf-8 encoded character streams.</p>
+
+	<div class="reference">
+	  <h3 class="libentity">phbase_codepoint</h3>
+	  <p>Integer type for a unicode codepoint.</p>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">size_t<br>phbase_utf8_decode_character(phbase_codepoint* out,
+	                     size_t length, const uint8_t* bytes)</h3>
+	  <p>UTF-8 decode a single unicode codepoint from an array of bytes. Returns the number of bytes decoded from the array. If the passed length is non-zero and <code>phbase_utf8_decode_character</code> returns zero, then the byte array does not start with a valid utf-8 byte sequence.</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">out</td>
+	      <td>A place to write the value of a successfully decoded codepoint.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">length</td>
+	      <td>The length of the bytestring to decode from.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">bytes</td>
+	      <td>An array of bytes to decode or length at least <code>length</code></td>
+	    </tr>
+	  </table>
+	</div>
+      </section>
+
+      <section id="arena">
+	<h2>arena</h2>
+        <p><code>phbase/arena.h</code> provides a bump allocator. All elements are freed at once via the reset procedure, or by freeing the underlying memory block.</p>
+
+	<div class="reference">
+	  <h3 class="libentity">struct phbase_arena</h3>
+	  <p>Structure for the control block of an arena allocator. Should be treated as an opaque structure and not manipulated directly.</p>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">void<br>phbase_arena_init(struct phbase_arena* a, size_t size, void* memory)</h3>
+	  <p>Initialize an arena with a preallocate block of memory with a given size.</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">a</td>
+	      <td>The arena to initialize.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">size</td>
+	      <td>The size of the memory in bytes that the arena should manage.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">memory</td>
+	      <td>A block of memory to manage - doesn't take ownership so the user is responsible for its lifetime.</td>
+	    </tr>
+	  </table>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">void<br>phbase_arena_reset(struct phbase_arena* a)</h3>
+	  <p>Throw away all previous allocations (won't zero the memory block).</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">a</td>
+	      <td>A pointer to the arena to reset.</td>
+	    </tr>
+	  </table>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">void*<br>phbase_arena_allocate(struct phbase_arena* a, size_t align, size_t size)</h3>
+	  <p>Aligned allocation in the arena. Returns <code>NULL</code> if the arena is exhausted, otherwise returns a pointer to the allocated memory.<p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">a</td>
+	      <td>The arena to allocate from.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">align</td>
+	      <td>The alignment of the allocation.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">size</td>
+	      <td>The size of the allocation.</td>
+	    </tr>
+	  </table>
+	</div>
+      </section>
+
+      <section id = "about">
+	<div class="text">
+	  <code>phbase</code> is a library of <code>C</code> utlities which are useful for everyday programming. It is licensed under the MIT license.
+	</div>
+      </section>
+
+    </div>
+
+    <div id="footer">
+      <p><i>phbase &copy 2022</i></p>
+    </div>
+  </body>
+
+</html>
