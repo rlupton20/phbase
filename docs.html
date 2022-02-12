@@ -137,6 +137,11 @@
 	      <td>utf-8 decoding function</td>
 	    </tr>
 
+	    <tr onclick="window.location='#extrusion';">
+              <td><a class="navigation" href="#extrusion">extrusion</a></td>
+	      <td>Recovering structure addresses from members.</td>
+	    </tr>
+
 	    <tr onclick="window.location='#arena';">
               <td><a class="navigation" href="#arena">arena</a></td>
 	      <td>lightweight arena allocator</td>
@@ -195,6 +200,33 @@
 	      <td>An array of bytes to decode or length at least <code>length</code></td>
 	    </tr>
 	  </table>
+	</div>
+      </section>
+
+      <section id="extrusion">
+	<h2>extrusion</h2>
+        <p><code>phbase/extrusion.h</code> provides a macro for recovering the base address of a structure from the address of a member.</p>
+
+	<div class="reference">
+	  <h3 class="libentity">ty*<br>PHBASE_EXTRUDE(v, ty, member)</h3>
+	  <p>Takes a pointer to a member of a structure, and recovers a pointer to the structure.</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">v</td>
+	      <td>Pointer to a member of structure.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">ty</td>
+	      <td>The name of the structure.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">member</td>
+	      <td>The member of <code>ty</code> pointed to by <code>v</code></td>
+	    </tr>
+	  </table>
+
+	  <p>This is often used with intrusive data structures to gain access to the data that the intrusive data structure manages.</p>
 	</div>
       </section>
 
