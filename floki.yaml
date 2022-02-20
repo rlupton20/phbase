@@ -1,3 +1,4 @@
 image:
   build:
     name: phbase
+shell: bash
