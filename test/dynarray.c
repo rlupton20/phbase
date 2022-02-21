@@ -38,7 +38,7 @@ test_dynarray_init(phbase_test_ctx* ctx)
 {
     static const size_t TEST_CAPACITY = 128;
 
-    PHBASE_DYNARRAY(size_t) a = {0};
+    PHBASE_DYNARRAY size_t* a = { 0 };
 
     if (phbase_dynarray_init_with_capacity(&a, TEST_CAPACITY) != PHBASE_STATUS_OK)
     {
@@ -98,8 +98,8 @@ test_dynarray_push(phbase_test_ctx* ctx)
     /* Often dynamic arrays are part of bigger structures - check
        declaring them as such still works. */
     struct {
-	PHBASE_DYNARRAY(size_t) a;
-    } s = {0};
+	PHBASE_DYNARRAY size_t* a;
+    } s = { 0 };
 
     if (phbase_dynarray_init_with_capacity(&s.a, TEST_CAPACITY))
     {
@@ -176,7 +176,7 @@ fatal:
 static void
 test_dynarray_pop(phbase_test_ctx* ctx)
 {
-    PHBASE_DYNARRAY(int) a = {0};
+    PHBASE_DYNARRAY int* a = { 0 };
 
     if (phbase_dynarray_init_with_capacity(&a, 8) != PHBASE_STATUS_OK)
     {
@@ -243,7 +243,7 @@ supremum_capacity(size_t size)
 static void
 test_dynarray_overflow(phbase_test_ctx* ctx)
 {
-    PHBASE_DYNARRAY(int) a = {0};
+    PHBASE_DYNARRAY int* a = { 0 };
 
     size_t capacity = supremum_capacity(sizeof(int));
 
@@ -270,7 +270,7 @@ fatal:
 static void
 test_dynarray_array_types(phbase_test_ctx* ctx)
 {
-    float (*vecs)[3] = { 0 };
+    float (PHBASE_DYNARRAY *vecs)[3] = { 0 };
     static_assert(sizeof(vecs[0]) == 3 * sizeof(float), "expected an array of float[3]");
 
     if (phbase_dynarray_init_with_capacity(&vecs, 8))
@@ -298,7 +298,7 @@ fatal:
 static void
 test_dynarray_proc_types(phbase_test_ctx* ctx)
 {
-    void (**procs)(phbase_test_ctx* ctx) = { 0 };
+    void (PHBASE_DYNARRAY **procs)(phbase_test_ctx* ctx) = { 0 };
 
     if (phbase_dynarray_init_with_capacity(&procs, 8))
     {

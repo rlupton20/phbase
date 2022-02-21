@@ -334,7 +334,7 @@
       <section id="dynarray">
 	<h2>dynarray</h2>
         <p><code>phbase/dynarray.h</code> provides a dynamic array for types with alignment less than <code>alignof(max_align_t)</code>.</p>
-	<p>The intention here is to imbue normal arrays, represented by pointers, with a set of operations for dynamic sizing. While a macro <code>PHBASE_DYNARRAY(ty)</code> is provided for declaring dynamic arrays of type <code>ty</code>, this is mainly intended as a declaration of intent - <code>ty*</code> could equally well have been used.</p>
+	<p>The intention here is to imbue normal pointers with a set of operations for dynamically sized arrays. A marker <code>PHBASE_DYNARRAY</code> is provided, which expands to nothing, in order to help declare intent.</p>
 	<p>Currently dynamic arrays use the standard C library allocators for allocating memory. Support for custom allocators will be added.</p>
 	<p>Operations on this data structure are not guaranteed to be threadsafe.</p>
 	<p>Most operations here are implemented as macros wrapping generic procedures.</p>
@@ -348,7 +348,7 @@
 int
 main(int argc, char* argv[])
 {
-    PHBASE_DYNARRAY(int) a = { 0 };
+    PHBASE_DYNARRAY int* a = { 0 };
 
     if (phbase_dynarray_init_with_capacity(&a, 1) != PHBASE_STATUS_OK)
     {
@@ -382,9 +382,8 @@ error:
 	</pre>
 
 	<div class="reference">
-	  <h3 class="libentity">PHBASE_DYNARRAY(ty)</h3>
-	  <p>Type for a dynamic array of elements of type <code>ty</code>. <code>PHBASE_DYNARRAY(ty)</code> expands to <code>ty*</code>, and it is part of the API that these two are equivalent.</p>
-	  <p>Dynamic arrays require initialization. A zeroed structure is taken to be uninitialized.</p>
+	  <h3 class="libentity">PHBASE_DYNARRAY</h3>
+	  <p>A marker for dynamic array types. Intended just to declare intent, since this macro expands to nothing.</p>
 	</div>
 
 	<div class="reference">
@@ -394,7 +393,7 @@ error:
 	</div>
 
 	<div class="reference">
-	  <h3 class="libentity">int<br>phbase_dynarray_init_with_capacity(PHBASE_DYNARRAY(ty)* a, size_t capacity)</h3>
+	  <h3 class="libentity">int<br>phbase_dynarray_init_with_capacity(ty** a, size_t capacity)</h3>
 	  <p>Initializes the dynamic array <code>a</code> to hold up to <code>capacity</code> elements of type <code>ty</code> without reallocation.<p>
 	  <p>On error, <code>a</code> is left untouched.<p>
 
@@ -424,7 +423,7 @@ error:
 	</div>
 
 	<div class="reference">
-	  <h3 class="libentity">void<br>phbase_dynarray_clear(PHBASE_DYNARRAY(ty)* a)</h3>
+	  <h3 class="libentity">void<br>phbase_dynarray_clear(ty** a)</h3>
 	  <p>Clears the memory allocated to the dynamic array <code>a</code>, and zeros <code>*a</code>.
 
 	  <table class="params">
@@ -436,7 +435,7 @@ error:
 	</div>
 
 	<div class="reference">
-	  <h3 class="libentity">size_t<br>phbase_dynarray_length(PHBASE_DYNARRAY(ty)* a)</h3>
+	  <h3 class="libentity">size_t<br>phbase_dynarray_length(ty** a)</h3>
 	  <p>Query the current length of a dynamic array.</p>
 
 	  <table class="params">
@@ -448,7 +447,7 @@ error:
 	</div>
 
 	<div class="reference">
-	  <h3 class="libentity">size_t<br>phbase_dynarray_capacity(PHBASE_DYNARRAY(ty)* a)</h3>
+	  <h3 class="libentity">size_t<br>phbase_dynarray_capacity(ty** a)</h3>
 	  <p>Query the current capacity (number of values which can be stored without reallocation) of a dynamic array.</p>
 
 	  <table class="params">
@@ -460,7 +459,7 @@ error:
 	</div>
 
 	<div class="reference">
-	  <h3 class="libentity">int<br>phbase_dynarray_push(PHBASE_DYNARRAY(ty)* a, ty v)</h3>
+	  <h3 class="libentity">int<br>phbase_dynarray_push(ty** a, ty v)</h3>
 	  <p>Push the value <code>v</code> onto the end of the array. The only way this can fail is if there is no capacity in the current allocation, and memory reallocation fails.</p>
 	  <p>If there is sufficient capacity in the dynamic array, <code>*a</code> is left unchanged. Reallocation may cause <code>a</code> to change.</p>
 
@@ -489,7 +488,7 @@ error:
 	</div>
 
 	<div class="reference">
-	  <h3 class="libentity">int<br>phbase_dynarray_pop(PHBASE_DYNARRAY(ty)* a, ty* out)</h3>
+	  <h3 class="libentity">int<br>phbase_dynarray_pop(ty** a, ty* out)</h3>
 	  <p>Pop an element off the end of the array, writing it to the location pointed to by out. On error, <code>*out</code> is unmodified.</p>
 
 	  <table class="params">
