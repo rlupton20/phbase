@@ -267,12 +267,69 @@ fatal:
     return;
 }
 
+static void
+test_dynarray_array_types(phbase_test_ctx* ctx)
+{
+    float (*vecs)[3] = { 0 };
+    static_assert(sizeof(vecs[0]) == 3 * sizeof(float), "expected an array of float[3]");
+
+    if (phbase_dynarray_init_with_capacity(&vecs, 8))
+    {
+	PHBASE_TEST_ERROR(ctx, "failed to initialize vecs");
+	goto fatal;
+    }
+
+    if (!vecs)
+    {
+	PHBASE_TEST_ERROR(ctx, "vecs is NULL despite successful initialization");
+    }
+
+    vecs[0][2] = 3.141;
+
+fatal:
+    if (vecs)
+    {
+	phbase_dynarray_clear(&vecs);
+    }
+
+    return;
+}
+
+static void
+test_dynarray_proc_types(phbase_test_ctx* ctx)
+{
+    void (**procs)(phbase_test_ctx* ctx) = { 0 };
+
+    if (phbase_dynarray_init_with_capacity(&procs, 8))
+    {
+	PHBASE_TEST_ERROR(ctx, "failed to initialize vecs");
+	goto fatal;
+    }
+
+    if (!procs)
+    {
+	PHBASE_TEST_ERROR(ctx, "procs is NULL despite successful initialization");
+    }
+
+    procs[0] = test_dynarray_proc_types;
+
+fatal:
+    if (procs)
+    {
+	phbase_dynarray_clear(&procs);
+    }
+
+    return;
+}
+
 static struct phbase_test tests[] = {
     PHBASE_TEST_RECORD(test_dynarray_support),
     PHBASE_TEST_RECORD(test_dynarray_init),
     PHBASE_TEST_RECORD(test_dynarray_push),
     PHBASE_TEST_RECORD(test_dynarray_pop),
     PHBASE_TEST_RECORD(test_dynarray_overflow),
+    PHBASE_TEST_RECORD(test_dynarray_array_types),
+    PHBASE_TEST_RECORD(test_dynarray_proc_types),
 };
 
 static struct phbase_test_testsuite suite = {
