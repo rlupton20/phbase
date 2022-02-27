@@ -2,6 +2,8 @@
 
 #include <phbase/extrusion.h>
 
+#include "allocation.h"
+
 #include <assert.h>
 #include <stdalign.h>
 #include <stdint.h>
@@ -17,18 +19,6 @@ struct dynarray
     size_t used;
     alignas(alignof(max_align_t)) uint8_t data[];
 };
-
-static inline int
-array_allocates(size_t count, size_t size)
-{
-    /* As a fast path overflow check, we check size and count are both
-       less than the square root of SIZE_MAX + 1. SIZE_MAX + 1 is
-       2^(sizeof(size_t) * 8) (8 bits to a byte), so the square root of
-       this has half the exponent. */
-    static const size_t SQRT_SIZE_OFLOW = 1UL << (sizeof(size_t) * 4);
-    return ((count < SQRT_SIZE_OFLOW) && (size < SQRT_SIZE_OFLOW))
-	|| !(SIZE_MAX / count < size);
-}
 
 static inline struct dynarray*
 dynarray_realloc(void* ptr, size_t count, size_t size)

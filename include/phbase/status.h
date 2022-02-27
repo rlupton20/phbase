@@ -12,6 +12,10 @@ enum phbase_status
     PHBASE_STATUS_DOES_NOT_EXIST,
     /* There was insufficient memory to complete the operation. */
     PHBASE_STATUS_NO_MEMORY,
+    /* The operation could not complete because of an invalid parameter. */
+    PHBASE_STATUS_INVALID_PARAMETER,
+    /* The operation could not complete because the entity was full. */
+    PHBASE_STATUS_FULL,
     /* Upper bound for status variants */
     PHBASE_STATUS_MAX_STATUS,
 };
