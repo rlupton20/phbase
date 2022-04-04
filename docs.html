@@ -157,6 +157,11 @@
 	      <td>dynamic array for standard alignment types.</td>
 	    </tr>
 
+	    <tr onclick="window.location='#ptrdex';">
+              <td><a class="navigation" href="#ptrdex">ptrdex</a></td>
+	      <td>hash-table with pointer type keys.</td>
+	    </tr>
+
 	  </table>
 	</div>
       </section>
@@ -204,6 +209,16 @@
 	    <tr>
 	      <td class="code">PHBASE_STATUS_NO_MEMORY</td>
 	      <td>The operation failed to complete because there was insufficient memory.</td>
+	    </tr>
+
+	    <tr>
+	      <td class="code">PHBASE_STATUS_INVALID_PARAMETER</td>
+	      <td>A provided parameter was not valid for the operation.</td>
+	    </tr>
+
+	    <tr>
+	      <td class="code">PHBASE_STATUS_FULL</td>
+	      <td>The operation failed because an entity was full.</td>
 	    </tr>
 	  </table>
 
@@ -513,6 +528,255 @@ error:
 	      <td><code>a</code> is empty, so no element could be popped. <code>out</code> remains unchanged.</td>
 	    </tr>
 	  </table>
+	</div>
+      </section>
+
+      <section id="ptrdex">
+	<h2>ptrdex</h2>
+        <p><code>phbase/ptrdex.h</code> provides a hash-table for pointer typed keys. It provides a basic control structure which can be unioned with an anonymous struct. The names used to construct these structures and unions are fixed to allow a set of macros to be used to manipulate these tables in a fairly generic way.</p>
+        <p>The following example illustrates how to setup the table properly, and then how to use the set of macros to work with it.</p>
+
+	<pre>
+int
+test_string_keys()
+{
+    int rc = 0;
+
+    static const char* keys[] = {
+	"foo", "bar", "baz"
+    };
+
+    /* The table is setup by including an internal member, with the table
+     * structure, unioned with an anonymous struct consisting of an array
+     * key containing keys, and an array value, containing values.
+     *
+     * This table maps const char* keys to uint32_t values. */
+
+    union {
+	struct phbase_ptrdex__internal internal;
+	struct {
+	    const char** key;
+	    uint32_t* value;
+	};
+    } ht = { 0 };
+
+    if (phbase_ptrdex_init_with_capacity(&ht, 32) != PHBASE_STATUS_OK)
+    {
+	rc = 1;
+	goto error;
+    }
+
+    /* First insert some key value pairs. */
+    for (uint32_t ix = 0; ix < PHBASE_STATIC_ARRAY_LENGTH(keys); ++ix)
+    {
+	struct phbase_ptrdex_locator l = { 0 };
+
+	if (phbase_ptrdex_obtain_slot(&ht, keys[ix], &l) != PHBASE_STATUS_OK)
+	{
+	    rc = 1;
+	    goto error;
+	}
+
+	phbase_ptrdex_insert(&ht, l, keys[ix], ix);
+    }
+
+    /* Now look for a value by key. */
+    size_t slot = 0;
+    if (phbase_ptrdex_find(&ht, keys[1], &slot) != PHBASE_STATUS_OK)
+    {
+	rc = 1;
+	goto error;
+    }
+
+    printf("The value at '%s' is %u\n", ht.key[slot], ht.value[slot]);
+
+error:
+    if (phbase_ptrdex_is_initialized(&ht))
+    {
+	phbase_ptrdex_clear(&ht);
+    }
+
+    return rc;
+}
+       </pre>
+
+	<div class="reference">
+	  <h3 class="libentity">struct phase_ptrdex__internal</h3>
+	  <p>Structure for providing hash-table functionality. Should be treated as opaque, and should be unioned with an anonymous struct containing a pointer to a key, and a pointer to a value.</p>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">int<br>phbase_ptrdex_init_with_capacity(ty* table, size_t capacity)</h3>
+	  <p>Initializes a table with a given capacity.</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">table</td>
+	      <td>The table to initialize.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">capacity</td>
+	      <td>The capacity to initialize with.</td>
+	    </tr>
+	  </table>
+
+	  <p>Return value</p>
+	  <table class="params">
+	    <tr>
+	      <td class="code">PHBASE_STATUS_OK</td>
+	      <td>The table was successfully initialized.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">PHBASE_STATUS_NO_MEMORY</td>
+	      <td>The table could not be initialized because it would use too much memory.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">PHBASE_STATUS_INVALID_PARAMETER</td>
+	      <td><code>capacity</code> was not valid. Currently capacity is limited to 2<sup>32</sup> - 1. This limitation is planned to be lifted.</td>
+	    </tr>
+	  </table>
+
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">void<br>phbase_ptrdex_clear(ty* table)</h3>
+	  <p>Clears an initialized table.</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">table</td>
+	      <td>The table to initialize.</td>
+	    </tr>
+	  </table>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">int<br>phbase_ptrdex_is_initialized(ty* table)</h3>
+	  <p>Determines if a table is initialized.</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">table</td>
+	      <td>The table to test for initialization.</td>
+	    </tr>
+	  </table>
+
+	  <p>Return value</p>
+	  <table class="params">
+	    <tr>
+	      <td class="code">true</td>
+	      <td>The table is successfully initialized.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">false</td>
+	      <td>The table is not initialized.</td>
+	    </tr>
+	  </table>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">int<br>phbase_ptrdex_find(ty* table, key_ty key, size_t* out)</h3>
+	  <p>Finds the slot where a key is located.</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">table</td>
+	      <td>The table to lookup key in.</td>
+	    </tr>
+
+	    <tr>
+	      <td class="code">key</td>
+	      <td>The key to lookup.</td>
+	    </tr>
+
+	    <tr>
+	      <td class="code">out</td>
+	      <td>A pointer to a location to write the slot in which key is found.</td>
+	    </tr>
+	  </table>
+
+	  <p>Return value</p>
+	  <table class="params">
+	    <tr>
+	      <td class="code">PHBASE_STATUS_OK</td>
+	      <td>The value was found, and out now contains the slot in which to find key.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">PHBASE_STATUS_DOES_NOT_EXIST</td>
+	      <td><code>key</code> was not found in the table.</td>
+	    </tr>
+	  </table>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">struct phbase_ptrdex_locator</h3>
+	  <p>Structure for storing location information when obtaining a slot for inserting a new key-value pair. Should be treated as opaque.</p>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">int<br>phbase_ptrdex_obtain_slot(ty* table, key_ty key, struct phbase_ptrdex_locator* out)</h3>
+	  <p>Obtains a slot to insert a key-value pair.</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">table</td>
+	      <td>The table to lookup key in.</td>
+	    </tr>
+
+	    <tr>
+	      <td class="code">key</td>
+	      <td>The key to lookup.</td>
+	    </tr>
+
+	    <tr>
+	      <td class="code">out</td>
+	      <td>A pointer to a <code>struct phbase_ptrdex_locator</code> which can be used to insert a key-value pair.</td>
+	    </tr>
+	  </table>
+
+	  <p>Return value</p>
+	  <table class="params">
+	    <tr>
+	      <td class="code">PHBASE_STATUS_OK</td>
+	      <td>A slot was found, and <code>out</code> can now be used to insert the key-value pair.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">PHBASE_STATUS_FULL</td>
+	      <td>The table has reached its maximum size, but would need growing to support the new key.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">PHBASE_STATUS_NO_MEMORY</td>
+	      <td>Could not obtain a slot, because obtaining a slot required the table to grow, and there is insufficient memory.</td>
+	    </tr>
+	  </table>
+	</div>
+
+	<div class="reference">
+	  <h3 class="libentity">void<br>phbase_ptrdex_insert(ty* table, struct phbase_ptrdex_locator locator, key_ty key, value_ty value)</h3>
+	  <p>Insert a key-value pair into the table using a locator.</p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">table</td>
+	      <td>The table to insert into.</td>
+	    </tr>
+
+	    <tr>
+	      <td class="code">locator</td>
+	      <td>A locator used to insert a key-value pair.</td>
+	    </tr>
+
+	    <tr>
+	      <td class="code">key</td>
+	      <td>The key to insert with.</td>
+	    </tr>
+
+	    <tr>
+	      <td class="code">value</td>
+	      <td>The value to insert at key</td>
+	    </tr>
+	  </table>
+
 	</div>
       </section>
 
