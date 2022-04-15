@@ -1,8 +1,11 @@
-.DEFAULT_GOAL=all
-.PRECIOUS: $(BUILD)/%.o
+BUILDROOT?=build
 
-BUILDROOT=build
-CFLAGS_BASE+=-Wall -Wextra -Werror -pedantic -std=c11 -Iinclude/ -MMD
+.DEFAULT_GOAL=all
+.EXTRA_PREREQS:=Makefile phbase.mk
+
+include phbase.mk
+
+CFLAGS_BASE+=-Wall -Wextra -Werror -pedantic -MMD -I$(INTERFACE) $(EXTRA_CFLAGS)
 
 ifeq ($(TARGET),release)
   CFLAGS_TARGET=-O2 -DNEBUG
@@ -17,33 +20,23 @@ BUILD=$(BUILDROOT)/$(TARGET)
 
 CFLAGS=$(CFLAGS_BASE) $(CFLAGS_TARGET)
 
-SRCS=$(shell find src/ bins/ test/ -name '*.c')
-OBJS=$(SRCS:%.c=$(BUILD)/%.o)
-DEPS=$(SRCS:%.c=$(BUILD)/%.d)
+DEPS=$(SOURCES:%.c=$(BUILD)/%.d) $(TEST_SOURCES:%c=$(BUILD)/%.d)
 -include $(DEPS)
 
-LIBOBJS=$(filter $(BUILD)/src/%, $(OBJS))
-TESTOBJS=$(filter $(BUILD)/test/%, $(OBJS))
-BINOBJS=$(filter $(BUILD)/bins/%, $(OBJS))
-BINS=$(BINOBJS:%.o=%)
-
-$(BUILD)/bins/test: $(BUILD)/bins/test.o $(LIBOBJS) $(TESTOBJS)
+$(BUILD)/bins/test: $(SOURCES:%.c=$(BUILD)/%.o) $(TEST_SOURCES:%.c=$(BUILD)/%.o)
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(BUILD)/bins/%: $(BUILD)/bins/%.o $(LIBOBJS)
-	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-
-$(BUILD)/%.o: %.c Makefile
+$(BUILD)/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-$(BUILD)/libphbase.a: $(LIBOBJS)
-	ar rcs $@ $(LIBOBJS)
+$(BUILD)/libphbase.a: $(SOURCES:%.c=$(BUILD)/%.o)
+	@mkdir -p $(@D)
+	ar rcs $@ $^
 
 .PHONY: all
-all: $(BINS) $(BUILD)/libphbase.a
+all: $(BUILD)/libphbase.a $(BUILD)/bins/test
 	@$(BUILD)/bins/test
 	@echo "Build of $(TARGET) target successful at $(shell date)"
 
