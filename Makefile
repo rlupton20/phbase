@@ -1,9 +1,9 @@
 BUILDROOT?=build
 
 .DEFAULT_GOAL=all
-.EXTRA_PREREQS:=Makefile phbase.mk
+.EXTRA_PREREQS:=Makefile clib.mk
 
-include phbase.mk
+include clib.mk
 
 CFLAGS_BASE+=-Wall -Wextra -Werror -pedantic -MMD -I$(INTERFACE) $(EXTRA_CFLAGS)
 
