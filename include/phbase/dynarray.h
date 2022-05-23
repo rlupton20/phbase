@@ -42,6 +42,12 @@
     phbase_dynarray__capacity((void**)(da))
 
 /******************************************************************************/
+/* Manually set the length of the dynamic array.                              */
+/******************************************************************************/
+#define phbase_dynarray_set_length(da, length)			\
+    phbase_dynarray__set_length((void**)(da), (length))
+
+/******************************************************************************/
 /* Push v onto the end of the dynamic array pointed to by da.                 */
 /******************************************************************************/
 #define phbase_dynarray_push(da, v)					\
@@ -73,6 +79,9 @@ phbase_dynarray__capacity(void** slots);
 
 int
 phbase_dynarray__ensure_capacity(void** slots, size_t count, size_t size);
+
+int
+phbase_dynarray__set_length(void** slots, size_t length);
 
 size_t
 phbase_dynarray__claim_back(void** slots);

@@ -474,6 +474,37 @@ error:
 	</div>
 
 	<div class="reference">
+	  <h3 class="libentity">int<br>phbase_dynarray_set_length(ty** a, size_t length)</h3>
+	  <p>
+	    Explicitly set length of the dynamic array.
+	    Will succeed only if <code>length</code> is less than the capacity of the array.
+	  </p>
+
+	  <table class="params">
+	    <tr>
+	      <td class="code">a</td>
+	      <td>Pointer to the dynamic array.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">length</td>
+	      <td>The requested length.</td>
+	    </tr>
+	  </table>
+
+	  <p>Return value</p>
+	  <table class="params">
+	    <tr>
+	      <td class="code">PHBASE_STATUS_OK</td>
+	      <td>Successfully set the length of the array.</td>
+	    </tr>
+	    <tr>
+	      <td class="code">PHBASE_STATUS_INVALID_PARAMETER</td>
+	      <td><code>a</code> has capacity less than the specified length.</td>
+	    </tr>
+	  </table>
+	</div>
+
+	<div class="reference">
 	  <h3 class="libentity">int<br>phbase_dynarray_push(ty** a, ty v)</h3>
 	  <p>Push the value <code>v</code> onto the end of the array. The only way this can fail is if there is no capacity in the current allocation, and memory reallocation fails.</p>
 	  <p>If there is sufficient capacity in the dynamic array, <code>*a</code> is left unchanged. Reallocation may cause <code>a</code> to change.</p>

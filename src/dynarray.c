@@ -114,6 +114,20 @@ phbase_dynarray__ensure_capacity(void** slots, size_t count, size_t size)
     return PHBASE_STATUS_OK;
 }
 
+int
+phbase_dynarray__set_length(void** slots, size_t length)
+{
+    struct dynarray* a = PHBASE_EXTRUDE(*slots, struct dynarray, data);
+
+    if (length > a->capacity)
+    {
+	return PHBASE_STATUS_INVALID_PARAMETER;
+    }
+
+    a->used = length;
+    return PHBASE_STATUS_OK;
+}
+
 size_t
 phbase_dynarray__claim_back(void** slots)
 {

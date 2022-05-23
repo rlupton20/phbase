@@ -322,6 +322,47 @@ fatal:
     return;
 }
 
+static void
+test_dynarray_set_length(phbase_test_ctx* ctx)
+{
+    PHBASE_DYNARRAY int* da = { 0 };
+
+    if (phbase_dynarray_init_with_capacity(&da, 8))
+    {
+	PHBASE_TEST_ERROR(ctx, "failed to initialize da");
+	goto fatal;
+    }
+
+    size_t length = phbase_dynarray_length(&da);
+
+    if (length != 0)
+    {
+	PHBASE_TEST_ERROR(ctx, "phbase_dynarray_length(&da) = %zu, but %zu was expected",
+			  length, 0);
+	goto fatal;
+    }
+
+    if (phbase_dynarray_set_length(&da, 8) != PHBASE_STATUS_OK)
+    {
+	PHBASE_TEST_ERROR(ctx, "failed to set length of da to capacity");
+	goto fatal;
+    }
+
+    if (phbase_dynarray_set_length(&da, 9) == PHBASE_STATUS_OK)
+    {
+	PHBASE_TEST_ERROR(ctx, "phbase_dynarray_set_length allowed length to be set beyond capacity");
+	goto fatal;
+    }
+
+fatal:
+    if (da)
+    {
+	phbase_dynarray_clear(&da);
+    }
+
+    return;
+}
+
 static struct phbase_test tests[] = {
     PHBASE_TEST_RECORD(test_dynarray_support),
     PHBASE_TEST_RECORD(test_dynarray_init),
@@ -330,6 +371,7 @@ static struct phbase_test tests[] = {
     PHBASE_TEST_RECORD(test_dynarray_overflow),
     PHBASE_TEST_RECORD(test_dynarray_array_types),
     PHBASE_TEST_RECORD(test_dynarray_proc_types),
+    PHBASE_TEST_RECORD(test_dynarray_set_length),
 };
 
 static struct phbase_test_testsuite suite = {
