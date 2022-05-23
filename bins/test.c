@@ -8,6 +8,7 @@ extern const struct phbase_test_testsuite* phbase_utf8_suite;
 extern const struct phbase_test_testsuite* phbase_extrusion_suite;
 extern const struct phbase_test_testsuite* phbase_dynarray_suite;
 extern const struct phbase_test_testsuite* phbase_ptrdex_suite;
+extern const struct phbase_test_testsuite* phbase_bitarray_suite;
 extern const struct phbase_test_testsuite* phbase_allocator_arena_suite;
 
 int
@@ -23,6 +24,7 @@ main(int argc, char* argv[])
     phbase_test_run_testsuite(phbase_extrusion_suite, &results);
     phbase_test_run_testsuite(phbase_dynarray_suite, &results);
     phbase_test_run_testsuite(phbase_ptrdex_suite, &results);
+    phbase_test_run_testsuite(phbase_bitarray_suite, &results);
 
     phbase_test_run_testsuite(phbase_allocator_arena_suite, &results);
 

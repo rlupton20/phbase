@@ -13,6 +13,7 @@ TEST_SOURCES := bins/test.c                                                    \
                 test/dynarray.c                                                \
                 test/extrusion.c                                               \
                 test/ptrdex.c                                                  \
-                test/utf8.c
+                test/utf8.c 						       \
+                test/bitarray.c
 
 EXTRA_CFLAGS := -std=c11
