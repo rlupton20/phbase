@@ -1,9 +1,8 @@
 #include <phbase/dynarray.h>
 
+#include <phbase/core.h>
 #include <phbase/allocator.h>
 #include <phbase/extrusion.h>
-
-#include "allocation.h"
 
 #include <assert.h>
 #include <stdalign.h>
@@ -26,7 +25,7 @@ dynarray_realloc(void* ptr, size_t count, size_t size)
     const size_t total_size = sizeof(struct dynarray) + size * count;
 
     /* Check for arithmetic overflow. */
-    if (array_allocates(count, size) && total_size > size * count)
+    if (phbase_array_allocates(count, size) && total_size > size * count)
     {
 	return PHBASE_ALLOCATOR_REALLOC(&phbase_allocator_libc, ptr, total_size);
     }

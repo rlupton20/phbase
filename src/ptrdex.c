@@ -1,9 +1,8 @@
 #include <phbase/ptrdex.h>
 
 #include <phbase/allocator.h>
+#include <phbase/core.h>
 #include <phbase/status.h>
-
-#include "allocation.h"
 
 #include <stdalign.h>
 
@@ -57,9 +56,9 @@ phbase_ptrdex__init_with_capacity(struct phbase_ptrdex__internal* t, size_t capa
     PHBASE_ASSERT(value_size > 0);
     /* NOTE KEY_SIZE > 0 */
 
-    if (!array_allocates(capacity, KEY_SIZE) ||
-	!array_allocates(capacity, value_size) ||
-	!array_allocates(capacity, sizeof(t->locator[0])) ||
+    if (!phbase_array_allocates(capacity, KEY_SIZE) ||
+	!phbase_array_allocates(capacity, value_size) ||
+	!phbase_array_allocates(capacity, sizeof(t->locator[0])) ||
 	value_offset < KEY_SIZE * capacity ||
 	locator_offset <= value_offset ||
 	allocation <= locator_offset)
