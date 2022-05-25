@@ -1,5 +1,6 @@
 #include <phbase/dynarray.h>
 
+#include <phbase/allocator.h>
 #include <phbase/extrusion.h>
 
 #include "allocation.h"
@@ -7,7 +8,6 @@
 #include <assert.h>
 #include <stdalign.h>
 #include <stdint.h>
-#include <stdlib.h> /* realloc, free */
 #include <string.h> /* memcpy */
 
 #define PHBASE_ASSERT assert
@@ -28,7 +28,7 @@ dynarray_realloc(void* ptr, size_t count, size_t size)
     /* Check for arithmetic overflow. */
     if (array_allocates(count, size) && total_size > size * count)
     {
-	return realloc(ptr, total_size);
+	return PHBASE_ALLOCATOR_REALLOC(&phbase_allocator_libc, ptr, total_size);
     }
     else
     {
@@ -62,7 +62,7 @@ void
 phbase_dynarray__clear(void** slots)
 {
     struct dynarray* a = PHBASE_EXTRUDE(*slots, struct dynarray, data);
-    free(a);
+    PHBASE_ALLOCATOR_FREE(&phbase_allocator_libc, a);
     *slots = NULL;
 }
 

@@ -1,5 +1,6 @@
 #include <phbase/ptrdex.h>
 
+#include <phbase/allocator.h>
 #include <phbase/status.h>
 
 #include "allocation.h"
@@ -7,7 +8,6 @@
 #include <stdalign.h>
 
 #include <assert.h> /* assert */
-#include <stdlib.h> /* malloc, free */
 #include <string.h> /* memset */
 
 #define PHBASE_ASSERT assert
@@ -67,7 +67,7 @@ phbase_ptrdex__init_with_capacity(struct phbase_ptrdex__internal* t, size_t capa
 	return PHBASE_STATUS_NO_MEMORY;
     }
 
-    uint8_t* mem = malloc(allocation);
+    uint8_t* mem = PHBASE_ALLOCATOR_MALLOC(&phbase_allocator_libc, allocation);
 
     if (!mem)
     {
@@ -88,7 +88,7 @@ phbase_ptrdex__init_with_capacity(struct phbase_ptrdex__internal* t, size_t capa
 void
 phbase_ptrdex__clear(struct phbase_ptrdex__internal* t)
 {
-    free(t->key);
+    PHBASE_ALLOCATOR_FREE(&phbase_allocator_libc, t->key);
     *t = (struct phbase_ptrdex__internal){ 0 };
 }
 

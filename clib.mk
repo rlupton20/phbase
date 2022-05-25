@@ -2,6 +2,7 @@ NAME         := phbase
 INTERFACE    := include
 
 SOURCES      := src/allocation.c                                               \
+                src/allocator.c                                                \
                 src/dynarray.c                                                 \
                 src/ptrdex.c                                                   \
                 src/test.c                                                     \
