@@ -6,6 +6,6 @@
 /******************************************************************************/
 /* Recover a structures address from a members address.                       */
 /******************************************************************************/
-#define PHBASE_EXTRUDE(v, ty, member) ((ty*)((char*)v - offsetof(ty, member)))
+#define PHBASE_EXTRUDE(v, ty, member) ((ty*)((char*)(v) - offsetof(ty, member)))
 
 #endif
