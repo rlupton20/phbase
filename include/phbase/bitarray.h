@@ -9,7 +9,7 @@
  * Determine the amount of memory needed for a bitarray containing
  * a number of bits.
  */
-#define PHBASE_BITARRAY_MEMORY_SIZE(bits) ((size_t)((bits) / 8))
+#define PHBASE_BITARRAY_MEMORY_SIZE(bits) ((size_t)((bits) / 8) + ((bits) % 8 ? 1 : 0))
 
 /*
  * How to align memory for bitarray memory.

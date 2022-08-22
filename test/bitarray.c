@@ -78,8 +78,57 @@ fatal:
     return;
 }
 
+static void
+test_bitarray_operations_not_multiple(struct phbase_test_ctx* ctx)
+{
+    void* memory = calloc(1, PHBASE_BITARRAY_MEMORY_SIZE(33));
+
+    if (!memory)
+    {
+	PHBASE_TEST_ERROR(ctx, "failed to allocate memory for bitarray");
+	goto fatal;
+    }
+
+    struct phbase_bitarray ba = phbase_bitarray_from_memory(memory);
+
+    phbase_bitarray_set_bit(&ba, 32);
+    phbase_bitarray_set_bit(&ba, 33);
+
+    if (!phbase_bitarray_bit_is_set(&ba, 32))
+    {
+	PHBASE_TEST_ERROR(ctx, "bitarray bit 32 was set, but reports that it is not");
+    }
+
+    if (!phbase_bitarray_bit_is_set(&ba, 33))
+    {
+	PHBASE_TEST_ERROR(ctx, "bitarray bit 33 was set, but reports that it is not");
+    }
+
+    phbase_bitarray_clear_bit(&ba, 32);
+    phbase_bitarray_clear_bit(&ba, 33);
+
+    if (phbase_bitarray_bit_is_set(&ba, 32))
+    {
+	PHBASE_TEST_ERROR(ctx, "bitarray bit 32 was unset, but return that it is set");
+    }
+
+    if (phbase_bitarray_bit_is_set(&ba, 33))
+    {
+	PHBASE_TEST_ERROR(ctx, "bitarray bit 33 was unset, but return that it is set");
+    }
+
+fatal:
+    if (memory)
+    {
+	free(memory);
+    }
+
+    return;
+}
+
 static struct phbase_test tests[] = {
     PHBASE_TEST_RECORD(test_bitarray_operations),
+    PHBASE_TEST_RECORD(test_bitarray_operations_not_multiple),
 };
 
 static struct phbase_test_testsuite suite = {
